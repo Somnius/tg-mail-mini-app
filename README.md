@@ -234,3 +234,85 @@ server {
     # Redirect HTTP to HTTPS or set SSL configuration here
 }
 ```
+
+### Telegram Setup
+
+- Follow the same BotFather instructions and webhook setup as for Docker setup, updating URLs accordingly.
+
+---
+
+### Telegram Bot Setup
+
+- Create your Telegram bot with [@BotFather](https://t.me/BotFather)  
+- Save the bot token securely  
+- Use `/setdomain` to set your domain (where frontend is hosted)  
+- Use `/setwebhook` to set your backend webhook URL  
+- Add an inline keyboard button with a WebApp URL for launching the Mini App  
+
+Example keyboard JSON:
+
+```json
+{
+  "inline_keyboard": [
+    [
+      {
+        "text": "Open tgmail",
+        "web_app": { "url": "https://tgmail.example.com" }
+      }
+    ]
+  ]
+}
+```
+
+Send this JSON via the `sendMessage` API or from your bot code.
+
+---
+
+### Configuration
+
+- `.env` or environment variables control sensitive settings (bot token, database credentials, Fernet key)  
+- Database URL format: `postgresql+asyncpg://user:password@host:port/dbname`  
+- Fernet key must be securely generated and kept secret for encrypting mailbox passwords  
+- Timezone can be set with `TZ` variable (e.g., `Europe/Athens`)  
+
+---
+
+### Development
+
+- Backend code lives under `/backend/app`  
+- Frontend React code lives under `/frontend/src`  
+- Use Docker Compose files under `/compose` for local or VPS deployments  
+- Use `uvicorn` to run backend in development mode, `npm run dev` for frontend  
+
+---
+
+## License
+
+This project is licensed under the MIT License.
+
+---
+
+## Credits and Attributions
+
+- Developed by Eleftherios Iliadis  
+- Uses open-source libraries and tools including:  
+  - [FastAPI](https://fastapi.tiangolo.com/)  
+  - [Python-Telegram-Bot](https://github.com/python-telegram-bot/python-telegram-bot)  
+  - [React](https://reactjs.org/)  
+  - [Traefik](https://traefik.io/)  
+  - [PostgreSQL](https://www.postgresql.org/)  
+  - [aioimaplib](https://github.com/fox-it/aioimaplib)  
+  - and others — see `requirements.txt` and `package.json`
+
+---
+
+## Contributing
+
+Contributions, bug reports, and feature requests are welcome!  
+Please open an issue or a pull request on GitHub.
+
+---
+
+## Contact
+
+Eleftherios Iliadis — lefteros@outlook.com / Lefteris @SomniusX
