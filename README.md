@@ -1,66 +1,88 @@
 # tgmail Mini App
 
-A Telegram Mini App providing email client features inside Telegram using IMAP/SMTP —  
-built with FastAPI, React, and Telegram Bot API.
+A Telegram Mini App providing an embedded email client experience inside Telegram using IMAP/SMTP protocols.  
+Built with **FastAPI** (backend), **React** (frontend), and the **Telegram Bot API**, deployed via Docker and Traefik.
+
+---
+
+## Project Overview
+
+This project aims to offer a seamless email client interface directly inside Telegram’s WebApp environment, similar to Telegram’s built-in Wallet app. It supports:
+
+- Telegram WebApp login authentication  
+- User IMAP mailbox connection testing  
+- Encrypted credential storage (planned)  
+- Modular backend and frontend with Docker-compose deployment  
+- Secure HTTPS access with automatic certificates via Traefik  
+- Easy customization and extensibility  
 
 ---
 
 ## Features
 
-- Telegram WebApp login authentication  
-- IMAP connection testing with user credentials  
-- Secure backend with encrypted credential storage (planned)  
-- Modular, Docker-compose based deployment  
-- Reverse proxy and HTTPS via Traefik  
-- Open-source and extensible  
+- FastAPI backend with Telegram Bot webhook integration  
+- React frontend integrated with Telegram WebApp SDK for authentication  
+- IMAP connection testing endpoint with async Python IMAP client  
+- Docker-based deployment for easy VPS setup  
+- Reverse proxy with Traefik including security headers and automatic Let's Encrypt certs  
 
 ---
 
-## Getting Started
+## Table of Contents
 
-### Requirements
-
-- Docker & docker-compose  
-- VPS with public IP and domain configured (e.g. `tgmail.srv-box.com`)  
-- Telegram bot token from [BotFather](https://t.me/BotFather)  
-
-### Deployment
-
-1. Clone the repo  
-2. Configure `.env` with your secrets and tokens  
-3. Deploy backend and frontend stacks with `docker-compose`  
-4. Setup DNS and Traefik to route domains  
-5. Register bot domain with BotFather (`/setdomain`)  
-6. Launch the Mini App from Telegram  
+- [Prerequisites](#prerequisites)  
+- [Quick Start — Docker VPS Deployment](#quick-start--docker-vps-deployment)  
+- [Step-by-Step Manual Deployment (Native / Home Server)](#step-by-step-manual-deployment-native--home-server)  
+- [Telegram Bot Setup](#telegram-bot-setup)  
+- [Configuration](#configuration)  
+- [Development](#development)  
+- [License](#license)  
+- [Credits and Attributions](#credits-and-attributions)  
+- [Contributing](#contributing)  
+- [Contact](#contact)  
 
 ---
 
-## License
+## Prerequisites
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## Credits and Attributions
-
-- Developed by Eleftherios Iliadis  
-- Built with open-source libraries and tools:
-  - [FastAPI](https://fastapi.tiangolo.com/)  
-  - [Python-Telegram-Bot](https://github.com/python-telegram-bot/python-telegram-bot)  
-  - [React](https://reactjs.org/)  
-  - [Traefik](https://traefik.io/)  
-  - [PostgreSQL](https://www.postgresql.org/)  
-  - [aioimaplib](https://github.com/fox-it/aioimaplib)  
-  - Others, see `requirements.txt` and `package.json`  
+- **VPS or server with public IP** or a home server with static IP and DNS setup  
+- **Domain name** configured with appropriate DNS A or CNAME records pointing to your server IP  
+- **Docker and docker-compose** installed (for Docker deployment)  
+- **Python 3.11+** and **Node.js 18+** (for manual/native deployment)  
+- Telegram bot token from [@BotFather](https://t.me/BotFather)  
+- Basic familiarity with Linux terminal and networking  
 
 ---
 
-## Contributing
+## Quick Start — Docker VPS Deployment
 
-Contributions and issues are welcome! Please open an issue or pull request on GitHub.
+This is the recommended deployment method for VPS users.
 
----
+### 1. Clone the repository
 
-## Contact
+```bash
+git clone https://github.com/yourusername/tgmail.git
+cd tgmail
+```
 
-Eleftherios Iliadis — [your email or website]  
+### 2. Prepare environment variables
+
+Create a .env file in the root project directory:
+
+```.env
+TELEGRAM_BOT_TOKEN=1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ
+POSTGRES_PASSWORD=yourStrongPassword
+FERNET_KEY=your_fernet_key_base64_string
+TZ=Europe/Athens
+DATABASE_URL=postgresql+asyncpg://tgmail:<POSTGRES_PASSWORD>@postgres:5432/tgmail
+```
+
+Notes:
+
+    You can generate a Fernet key in Python:
+    ```python
+    from cryptography.fernet import Fernet
+    print(Fernet.generate_key().decode())
+    ```
+    Replace <POSTGRES_PASSWORD> in DATABASE_URL with your actual password
+
