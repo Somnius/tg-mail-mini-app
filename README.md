@@ -22,6 +22,13 @@ This project aims to offer a seamless email client interface directly inside Tel
 
 ---
 
+## Project CAUTION
+
+It is under heavy construction, don't open an issue before the project is marked as version v0.1.
+It is still on the draft-table.
+
+---
+
 ## Features
 
 - FastAPI backend with Telegram Bot webhook integration  
