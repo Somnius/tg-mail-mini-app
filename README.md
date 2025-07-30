@@ -79,10 +79,158 @@ DATABASE_URL=postgresql+asyncpg://tgmail:<POSTGRES_PASSWORD>@postgres:5432/tgmai
 
 Notes:
 
-    You can generate a Fernet key in Python:
-    ```python
-    from cryptography.fernet import Fernet
-    print(Fernet.generate_key().decode())
-    ```
-    Replace <POSTGRES_PASSWORD> in DATABASE_URL with your actual password
+You can generate a Fernet key in Python:
+```python
+from cryptography.fernet import Fernet
+print(Fernet.generate_key().decode())
+```
+Replace <POSTGRES_PASSWORD> in DATABASE_URL with your actual password
 
+### 3. Configure DNS
+
+Set DNS A records for your domain, e.g., `tgmail.example.com` to point to your server IP.
+
+### 4. Setup Traefik (already included)
+
+- Your Traefik container handles HTTP->HTTPS redirects and automatic Let’s Encrypt certificates.
+- Make sure ports 80 and 443 are open on your server firewall.
+
+### 5. Build and start backend and frontend stacks
+
+```bash
+cd compose
+docker-compose -f backend.yaml build
+docker-compose -f backend.yaml up -d
+
+docker-compose -f frontend.yaml build
+docker-compose -f frontend.yaml up -d
+```
+
+### 6. Initialize database schema (once)
+
+```bash
+docker exec -it <backend_container_id> python /app/app/db_init.py
+```
+don't forget to swap `<backend_container_id>` with yours
+
+### 7. Set Telegram bot webhook
+
+Replace `<BOT_TOKEN>` and `<DOMAIN>` accordingly:
+```bash
+curl -F "url=https://tgmail.example.com/webhook/<BOT_TOKEN>" https://api.telegram.org/bot<BOT_TOKEN>/setWebhook
+```
+
+### 8. Setup bot domain in BotFather
+
+Send `/setdomain` command in `BotFather` for your bot, enter your domain `tgmail.example.com`.
+
+### 9. Launch the Mini App
+
+- Open Telegram mobile app
+- Chat with your bot
+- Tap on the custom "Open tgmail" WebApp button (set via inline keyboard)
+- The Mini App will load inside Telegram with Telegram login enabled
+
+### 10. Test IMAP connection
+
+- Enter your IMAP server, email, and password in the form
+- Submit to test connection to your mailbox
+
+## Step-by-Step Manual Deployment (Native / Home Server)
+
+If you prefer not to use Docker or have your own server with a static IP, you can deploy the app manually.
+
+### Requirements
+
+- Python 3.11+ installed with `pip`  
+- Node.js 18+ installed with `npm` or `yarn`  
+- PostgreSQL server running and accessible  
+- A reverse proxy (e.g., Nginx or Caddy) for HTTPS termination  
+- Domain name configured to point to your server  
+
+---
+
+### Backend
+
+1. **Create and activate a Python virtual environment:**
+
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+2. **Install dependencies:**
+
+    ```bash
+    pip install fastapi uvicorn python-telegram-bot[async] asyncpg sqlalchemy[asyncio] cryptography aioimaplib pydantic
+    ```
+
+3. **Configure environment variables** (export or use a `.env` file):
+
+    ```bash
+    export TELEGRAM_BOT_TOKEN="your_bot_token"
+    export POSTGRES_PASSWORD="your_password"
+    export FERNET_KEY="your_fernet_key"
+    export DATABASE_URL="postgresql+asyncpg://tgmail:your_password@localhost:5432/tgmail"
+    ```
+
+4. **Initialize the database schema:**
+
+    ```bash
+    python app/db_init.py
+    ```
+
+5. **Run the backend server:**
+
+    ```bash
+    uvicorn app.main:app --host 0.0.0.0 --port 8000
+    ```
+
+---
+
+### Frontend
+
+1. **Navigate to the frontend folder:**
+
+    ```bash
+    cd frontend
+    ```
+
+2. **Install dependencies:**
+
+    ```bash
+    npm install
+    ```
+
+3. **Build the React app:**
+
+    ```bash
+    npm run build
+    ```
+
+4. **Serve static files** via Nginx, Caddy, or any web server on your domain.
+
+---
+
+### Reverse Proxy Setup
+
+Example **Nginx** server block (simplified):
+
+```nginx
+server {
+    listen 80;
+    server_name tgmail.example.com;
+
+    location / {
+        proxy_pass http://localhost:8000;  # Backend API
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+    }
+
+    location /static/ {
+        root /path/to/frontend/build;
+    }
+
+    # Redirect HTTP to HTTPS or set SSL configuration here
+}
+```
