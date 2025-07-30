@@ -3,6 +3,10 @@
 A Telegram Mini App providing an embedded email client experience inside Telegram using IMAP/SMTP protocols.  
 Built with **FastAPI** (backend), **React** (frontend), and the **Telegram Bot API**, deployed via Docker and Traefik.
 
+<p align="center">
+  <img src="tg-email_logo.png" alt="tgmail Logo" width="200" />
+</p>
+
 ---
 
 ## Project Overview
